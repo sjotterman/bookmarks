@@ -46,12 +46,10 @@ var rootCmd = &cobra.Command{
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
 	Run: func(cmd *cobra.Command, args []string) {
-		saveFile := viper.Get("saveFile")
-		enableLogging := viper.Get("enableLogging")
-		fmt.Println("saveFile", saveFile)
-		fmt.Println("enableLogging", enableLogging)
+		saveFile := viper.GetString("saveFile")
+		enableLogging := viper.GetBool("enableLogging")
 
-		if enableLogging == "true" {
+		if enableLogging {
 			f, err := tea.LogToFile("debug.log", "debug")
 			if err != nil {
 				log.Fatal(err)
@@ -66,7 +64,7 @@ var rootCmd = &cobra.Command{
 			}()
 		}
 
-		m := ui.NewModel()
+		m := ui.NewModel(saveFile)
 		var opts []tea.ProgramOption
 
 		opts = append(opts, tea.WithAltScreen())

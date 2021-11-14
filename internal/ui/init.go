@@ -8,5 +8,5 @@ import (
 // Right now this doesn't do anything, but this is
 // where the initial bookmarks should be read in
 func (m Model) Init() tea.Cmd {
-	return nil
+	return m.loadBookmarksCmd()
 }

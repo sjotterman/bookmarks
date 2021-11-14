@@ -1,12 +1,18 @@
 package ui
 
 import (
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
+type updateBookmarkListMsg struct{ items []list.Item }
+
 func (m *Model) handleXKeyPress(cmds *[]tea.Cmd) {
-	m.text = "Updated!"
-	m.list.Title = m.text
+	m.list.Title = "Pressed a button!"
+}
+
+func (m *Model) handleUpdateBookmarksListMsg(msg updateBookmarkListMsg, cmds *[]tea.Cmd) {
+	m.list.SetItems(msg.items)
 }
 
 // handleWindowSizeMsg is received whenever the window size changes.
@@ -28,6 +34,9 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		if msg.String() == "x" {
 			m.handleXKeyPress(&cmds)
 		}
+
+	case updateBookmarkListMsg:
+		m.handleUpdateBookmarksListMsg(msg, &cmds)
 
 	}
 	m.list, cmd = m.list.Update(msg)

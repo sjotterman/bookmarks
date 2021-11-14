@@ -15,18 +15,15 @@ func (i item) FilterValue() string { return i.title }
 
 type Model struct {
 	docStyle lipgloss.Style
-	list     list.Model
+	list         list.Model
+	saveFilePath string
 }
 
-func NewModel() Model {
-	items := []list.Item{
-		item{title: "foo.md", desc: "First file"},
-		item{title: "bar.md", desc: "Second file"},
-		item{title: "foobar.md", desc: "Third file"},
-		item{title: "baz.md", desc: "Fourth file"},
-	}
+func NewModel(saveFilePath string) Model {
+	items := []list.Item{}
 	return Model{
-		docStyle: lipgloss.NewStyle().Margin(1, 0, 0, 0),
-		list:     list.NewModel(items, list.NewDefaultDelegate(), 0, 0),
+		docStyle:     lipgloss.NewStyle().Margin(1, 0, 0, 0),
+		list:         list.NewModel(items, list.NewDefaultDelegate(), 0, 0),
+		saveFilePath: saveFilePath,
 	}
 }
