@@ -23,11 +23,16 @@ package cmd
 
 import (
 	"fmt"
+	"log"
 	"os"
+
+	"github.com/sjotterman/bookmarks/internal/ui"
 
 	"github.com/spf13/cobra"
 
 	"github.com/spf13/viper"
+
+	tea "github.com/charmbracelet/bubbletea"
 )
 
 var cfgFile string
@@ -40,7 +45,38 @@ var rootCmd = &cobra.Command{
 	Long: `CLI bookmark management tool.`,
 	// Uncomment the following line if your bare application
 	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Run: func(cmd *cobra.Command, args []string) {
+		saveFile := viper.Get("saveFile")
+		enableLogging := viper.Get("enableLogging")
+		fmt.Println("saveFile", saveFile)
+		fmt.Println("enableLogging", enableLogging)
+
+		if enableLogging == "true" {
+			f, err := tea.LogToFile("debug.log", "debug")
+			if err != nil {
+				log.Fatal(err)
+				os.Exit(1)
+			}
+
+			defer func() {
+				if err = f.Close(); err != nil {
+					log.Fatal(err)
+					os.Exit(1)
+				}
+			}()
+		}
+
+		m := ui.NewModel()
+		var opts []tea.ProgramOption
+
+		opts = append(opts, tea.WithAltScreen())
+
+		p := tea.NewProgram(m, opts...)
+		if err := p.Start(); err != nil {
+			log.Fatal("Failed to start", err)
+			os.Exit(1)
+		}
+	},
 }
 
 // Execute adds all child commands to the root command and sets flags appropriately.
@@ -65,6 +101,11 @@ func init() {
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {
+	// Default config. If this gets more complex, it should be extracted
+	// to a separate file
+	viper.SetDefault("saveFile", "bookmarks.csv")
+	viper.SetDefault("enableLogging", false)
+
 	if cfgFile != "" {
 		// Use config file from the flag.
 		viper.SetConfigFile(cfgFile)
