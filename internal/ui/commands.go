@@ -1,8 +1,9 @@
 package ui
 
 import (
-	"bufio"
+	"encoding/csv"
 	"errors"
+	"io"
 	"log"
 	"os"
 
@@ -34,17 +35,25 @@ func (m Model) loadBookmarksCmd() tea.Cmd {
 			return nil
 		}
 		defer file.Close()
-		scanner := bufio.NewScanner(file)
-
+		reader := csv.NewReader(file)
 		items := []list.Item{}
-		for scanner.Scan() {
-			line := scanner.Text()
-			items = append(items, item{title: line})
-			log.Println("line", line)
+		for {
+			records, err := reader.Read()
+			if err != nil {
+				if err == io.EOF {
+					break
+				}
+				log.Fatal(err)
+			}
+			title := records[0]
+			var isRead bool
+			readStatusString := records[1]
+			if readStatusString == "read" {
+				isRead = true
+			}
+			items = append(items, item{title: title, isRead: isRead})
 		}
-		if err := scanner.Err(); err != nil {
-			log.Fatal(err)
-		}
+
 		var updateListMsg updateBookmarkListMsg
 		updateListMsg.items = items
 		return updateListMsg

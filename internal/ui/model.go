@@ -1,15 +1,24 @@
 package ui
 
 import (
+	"fmt"
+
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/lipgloss"
 )
 
 type item struct {
 	title, desc string
+	isRead      bool
 }
 
-func (i item) Title() string       { return i.title }
+func (i item) Title() string {
+	if i.isRead {
+		return fmt.Sprintf("☐ %s", i.title)
+	}
+	return fmt.Sprintf("☑ %s", i.title)
+}
+
 func (i item) Description() string { return i.desc }
 func (i item) FilterValue() string { return i.title }
 
