@@ -7,18 +7,30 @@ import (
 	tea "github.com/charmbracelet/bubbletea"
 )
 
-type updateBookmarkListMsg struct{ items []list.Item }
+type updateBookmarkListMsg struct{ items []item }
 type saveFileNotExistsMsg struct{ filename string }
 type emptyFileCreatedMsg struct{ filename string }
+type markItemReadMsg struct{ filename string }
 
-func (m *Model) handleXKeyPress(cmds *[]tea.Cmd) {
-	m.list.Title = "Pressed a button!"
+func (m *Model) handleMKeyPress(msg tea.Msg, cmds *[]tea.Cmd) {
+	index := m.list.Index()
+	newItem := m.items[index]
+	newItem.isRead = !newItem.isRead
+	m.items[index] = newItem
+	*cmds = append(*cmds, m.list.SetItem(index, newItem))
 }
 
 func (m *Model) handleUpdateBookmarksListMsg(msg updateBookmarkListMsg, cmds *[]tea.Cmd) {
 	cmd := m.list.NewStatusMessage("Loaded bookmarks!")
 	*cmds = append(*cmds, cmd)
-	m.list.SetItems(msg.items)
+	m.items = msg.items
+	var listItems []list.Item
+	// This is kind of hacky, but it's the only way I can find to
+	// access and modify the items in place
+	for _, item := range msg.items {
+		listItems = append(listItems, item)
+	}
+	*cmds = append(*cmds, m.list.SetItems(listItems))
 }
 
 func (m *Model) handleCreateEmptyFileMsg(msg saveFileNotExistsMsg, cmds *[]tea.Cmd) {

@@ -7,7 +7,6 @@ import (
 	"log"
 	"os"
 
-	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
@@ -36,7 +35,7 @@ func (m Model) loadBookmarksCmd() tea.Cmd {
 		}
 		defer file.Close()
 		reader := csv.NewReader(file)
-		items := []list.Item{}
+		items := []item{}
 		for {
 			records, err := reader.Read()
 			if err != nil {

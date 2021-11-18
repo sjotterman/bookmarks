@@ -13,7 +13,7 @@ type item struct {
 }
 
 func (i item) Title() string {
-	if i.isRead {
+	if !i.isRead {
 		return fmt.Sprintf("☐ %s", i.title)
 	}
 	return fmt.Sprintf("☑ %s", i.title)
@@ -25,6 +25,7 @@ func (i item) FilterValue() string { return i.title }
 type Model struct {
 	docStyle lipgloss.Style
 	list         list.Model
+	items        []item
 	saveFilePath string
 }
 
