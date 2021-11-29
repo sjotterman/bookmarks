@@ -3,6 +3,7 @@ package ui
 import (
 	"fmt"
 
+	"github.com/charmbracelet/bubbles/key"
 	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 )
@@ -12,7 +13,7 @@ type saveFileNotExistsMsg struct{ filename string }
 type emptyFileCreatedMsg struct{ filename string }
 type markItemReadMsg struct{ filename string }
 
-func (m *Model) handleMKeyPress(msg tea.Msg, cmds *[]tea.Cmd) {
+func (m *Model) handleToggleRead(msg tea.Msg, cmds *[]tea.Cmd) {
 	index := m.list.Index()
 	newItem := m.items[index]
 	newItem.isRead = !newItem.isRead
@@ -56,11 +57,12 @@ func (m Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.WindowSizeMsg:
 		m.handleWindowSizeMsg(msg, &cmds)
 	case tea.KeyMsg:
+		switch {
+		case key.Matches(msg, m.KeyMap.ToggleRead):
+			m.handleToggleRead(msg, &cmds)
+		}
 		if msg.String() == "ctrl+c" {
 			return m, tea.Quit
-		}
-		if msg.String() == "x" {
-			m.handleXKeyPress(&cmds)
 		}
 
 	case updateBookmarkListMsg:
